@@ -1,44 +1,48 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import {Setting} from "./Setting";
 import {View} from "./View";
+import {AppDispatch, RootState} from "./store";
+import {useDispatch, useSelector} from "react-redux";
+import {increment, setCount, setInc, setMax, setSet, setStart} from "./counterSlice";
 
 function App() {
-    const [count, setCount] = useState<number>(0)
-    const [inc, setInc] = useState<boolean>(false)
-    const [set, setSet] = useState<boolean>(true)
-    const [max, setMax] = useState<number>(5)
-    const [start, setStart] = useState<number>(0)
+    const count = useSelector((state: RootState) => state.counter.value)
+    const set = useSelector((state: RootState) => state.counter.set)
+    const max = useSelector((state: RootState) => state.counter.max)
+    const start = useSelector((state: RootState) => state.counter.start)
+
+    const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
         let getStartVal = localStorage.getItem('startValue')
         if (getStartVal) {
-            setStart(JSON.parse(getStartVal))
-            setCount(JSON.parse(getStartVal))
+            dispatch(setStart(JSON.parse(getStartVal)))
+            dispatch(setCount(JSON.parse(getStartVal)))
         }
         let getMaxVal = localStorage.getItem('maxValue')
         if (getMaxVal) {
-            setMax(JSON.parse(getMaxVal))
+            dispatch(setMax(JSON.parse(getMaxVal)))
         }
     }, [])
 
     const getMaxValue = (value: string) => {
-        setMax(Number(value))
+        dispatch(setMax(Number(value)))
     }
     const getStartValue = (value: string) => {
-        setStart(Number(value))
+        dispatch(setStart(Number(value)))
     }
 
     const setValues = () => {
-        setSet(true)
-        setInc(false)
-        setCount(start)
+        dispatch(setSet(true))
+        dispatch(setInc(false))
+        dispatch(setCount(start))
         localStorage.setItem('startValue', JSON.stringify(start))
         localStorage.setItem('maxValue', JSON.stringify(max))
     }
     const addValue = () => {
-        setCount(count + 1)
-        if (Number(count) >= max - 1) setInc(true)
+        dispatch(increment())
+        if (Number(count) >= max - 1) dispatch(setInc(true))
     }
 
     return (
@@ -47,8 +51,6 @@ function App() {
                 !set
                     ? <div className='commonBoxes'>
                         <Setting
-                            start={start}
-                            max={max}
                             getStartValue={getStartValue}
                             getMaxValue={getMaxValue}
                             setValues={setValues}
@@ -57,14 +59,7 @@ function App() {
                     :
                     <div className='commonBoxes'>
                         <View
-                            count={count}
-                            start={start}
-                            max={max}
-                            inc={inc}
                             addValue={addValue}
-                            setCount={setCount}
-                            setInc={setInc}
-                            setSet={setSet}
                         />
                     </div>
             }

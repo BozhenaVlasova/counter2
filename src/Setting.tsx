@@ -1,24 +1,26 @@
 import React, {ChangeEvent} from 'react';
+import {useSelector} from "react-redux";
+import {RootState} from "./store";
 
 export type BoxPropsType = {
-    start: number,
-    max: number,
-
     getStartValue:(value: string) => void,
     getMaxValue:(value: string) => void,
     setValues:() => void
 }
 
-export const Setting = (props: BoxPropsType) => {
+export const Setting: React.FC<BoxPropsType> = (props) => {
+    const {getStartValue, getMaxValue, setValues} = props
+    const max = useSelector((state: RootState) => state.counter.max)
+    const start = useSelector((state: RootState) => state.counter.start)
 
     const onChangeMaxValue = (e: ChangeEvent<HTMLInputElement>) => {
-        props.getMaxValue?.(e.currentTarget.value)
+        getMaxValue?.(e.currentTarget.value)
     }
     const onChangeStartValue = (e: ChangeEvent<HTMLInputElement>) => {
-        props.getStartValue?.(e.currentTarget.value)
+        getStartValue?.(e.currentTarget.value)
     }
     const onClickSet = () => {
-        props.setValues()
+        setValues()
     }
 
 //---------------------------------------------------------------------------------------
@@ -29,24 +31,24 @@ export const Setting = (props: BoxPropsType) => {
                     <div className='valueItem'>
                         <div>max value:</div>
                         <input
-                            className={props.max <= props.start? 'error' : ''}
+                            className={max <= start? 'error' : ''}
                             type='number'
-                            value={props.max}
+                            value={max}
                             onChange={onChangeMaxValue}
                         />
                     </div>
                     <div className='valueItem'>
                         <div>start value:</div>
                         <input
-                            className={props.start < 0 || props.start >= props.max ? 'error' : ''}
+                            className={start < 0 || start >= max ? 'error' : ''}
                             type='number'
-                            value={props.start}
+                            value={start}
                             onChange={onChangeStartValue}
                         />
                     </div>
                 </div>
                 <div className='buttons'>
-                    <button disabled={props.start < 0 || props.start >= props.max} onClick={onClickSet}>set</button>
+                    <button disabled={start < 0 || start >= max} onClick={onClickSet}>set</button>
                 </div>
             </div>
         )
